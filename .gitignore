@@ -1,0 +1,84 @@
+# Flutter/Dart/Pub related
+**/doc/api/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+.cache
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/.name
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+
+# VS Code related
+.vscode/
+.history/
+
+# Mac/Linux/Windows related
+.DS_Store
+*.class
+*.lock
+*.log
+*.pyc
+*.swp
+*.swo
+Thumbs.db
+
+# Android related
+local.properties
+*.jks
+*.keystore
+*.gradle/
+**/gradle-wrapper.properties
+**/gradlew
+**/gradlew.bat
+**/gradle-wrapper.jar
+**/gradle-wrapper.kts
+
+# iOS related
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/.symlinks/
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Runner.xcodeproj/project.pbxproj
+ios/Runner.xcodeproj/xcuserdata/
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-*
+ios/Flutter/App.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Flutter.xcframework
+ios/.generated
+
+# Flutter-Plugin related
+.podspec
+*.flutter-plugins
+*.flutter-plugins-dependencies
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
+# Miscellaneous
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swm
+*.swo
+*.old
+*.orig
+*.orig.*
+*.rej
