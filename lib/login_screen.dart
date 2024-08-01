@@ -23,13 +23,16 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       User? user = userCredential.user;
       if (user != null) {
-        DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
         if (userDoc.exists) {
           bool isPatient = userDoc['is_patient'];
           if (isPatient) {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => PatientHomePage()));
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => PatientHomePage()));
           } else {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DoctorHomePage()));
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => DoctorHomePage()));
           }
         }
       }
@@ -38,35 +41,71 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _forgotPassword() {
+    // Add forgot password functionality here
+    // For example, navigate to a forgot password page or show a dialog to enter email for password reset
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Image.asset('assets/logo.png', height: 100),
-              SizedBox(height: 20),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _login,
-                child: Text('Login'),
-              ),
-              Spacer(),
-              Text('App Footer', style: TextStyle(color: Colors.grey)),
-            ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                // Logo
+                ClipRRect(
+                    borderRadius: BorderRadius.circular(
+                        300.0), // Adjust the radius as needed
+                    child: Image.asset(
+                      'assets/logo.png',
+                      height: 350,
+                    )),
+                SizedBox(height: 40.0),
+
+                // Email TextField
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Email',
+                  ),
+                ),
+                SizedBox(height: 20.0),
+
+                // Password TextField
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Password',
+                  ),
+                ),
+                SizedBox(height: 10.0),
+
+                // Forgot Password link
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _forgotPassword,
+                    child: Text('Forgot Password?'),
+                  ),
+                ),
+
+                SizedBox(height: 20.0),
+
+                // Login Button
+                ElevatedButton(
+                  onPressed: _login,
+                  child: Text('Login'),
+                ),
+                SizedBox(height: 20.0),
+              ],
+            ),
           ),
         ),
       ),
