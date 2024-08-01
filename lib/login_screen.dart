@@ -90,12 +90,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Email',
-                    labelStyle: TextStyle(color: Colors.teal),
+                    labelStyle:
+                        TextStyle(color: Theme.of(context).primaryColor),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.teal),
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor),
                     ),
                   ),
-                  cursorColor: Colors.teal,
+                  cursorColor: Theme.of(context).primaryColor,
                 ),
                 SizedBox(height: 20.0),
 
@@ -106,12 +108,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Password',
-                    labelStyle: TextStyle(color: Colors.teal),
+                    labelStyle:
+                        TextStyle(color: Theme.of(context).primaryColor),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.teal),
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor),
                     ),
                   ),
-                  cursorColor: Colors.teal,
+                  cursorColor: Theme.of(context).primaryColor,
                 ),
                 SizedBox(height: 10.0),
 
@@ -122,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: _forgotPassword,
                     child: Text(
                       'Forgot Password?',
-                      style: TextStyle(color: Colors.teal),
+                      style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
                   ),
                 ),
@@ -133,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ElevatedButton(
                   onPressed: _login,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   child: _isLoading
                       ? CircularProgressIndicator(
@@ -142,7 +146,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         )
                       : Text(
                           'Login',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary),
                         ),
                 ),
                 if (_errorMessage.isNotEmpty)

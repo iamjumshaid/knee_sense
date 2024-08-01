@@ -1,46 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'login_screen.dart';
+import 'partials/doctor_header.dart';
+import 'partials/doctor_footer.dart';
 
 class DoctorHomePage extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  void _logout(BuildContext context) async {
-    await _auth.signOut();
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-      (route) => false,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.teal,
-        title: Row(
-          children: [
-            Image.asset('assets/logo.png', height: 40),
-            SizedBox(width: 10),
-            Text('Knee Sense', style: TextStyle(color: Colors.white)),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              // Implement search functionality here
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () => _logout(context),
-          ),
-        ],
-      ),
+      appBar: AppHeader(title: 'Knee Sense'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -53,7 +22,7 @@ class DoctorHomePage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.teal,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
                 ElevatedButton.icon(
@@ -63,7 +32,7 @@ class DoctorHomePage extends StatelessWidget {
                   icon: Icon(Icons.add, color: Colors.white),
                   label: Text('Invite', style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Theme.of(context).primaryColor,
                   ),
                 ),
               ],
@@ -85,8 +54,11 @@ class DoctorHomePage extends StatelessWidget {
                         margin: EdgeInsets.symmetric(vertical: 8.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15.0),
-                          gradient: const LinearGradient(
-                            colors: [Color.fromRGBO(194, 230, 228, 1), Color.fromARGB(255, 215, 222, 222)],
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).primaryColor.withOpacity(0.1),
+                              Theme.of(context).primaryColor.withOpacity(0.15),
+                            ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
@@ -99,7 +71,7 @@ class DoctorHomePage extends StatelessWidget {
                               Row(
                                 children: [
                                   CircleAvatar(
-                                    backgroundColor: Colors.teal,
+                                    backgroundColor: Theme.of(context).primaryColor,
                                     child: Icon(Icons.person, color: Colors.white),
                                   ),
                                   SizedBox(width: 10),
@@ -141,23 +113,8 @@ class DoctorHomePage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: AppFooter(
         currentIndex: 0,
-        selectedItemColor: Colors.teal,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center),
-            label: 'Exercises',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
         onTap: (index) {
           // Handle navigation here
         },
