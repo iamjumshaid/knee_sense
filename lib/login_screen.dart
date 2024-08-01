@@ -15,7 +15,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  bool _isLoading = false;
+  String _errorMessage = '';
+
   void _login() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
@@ -34,10 +41,20 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => DoctorHomePage()));
           }
+        } else {
+          setState(() {
+            _errorMessage = 'User data not found';
+          });
         }
       }
     } catch (e) {
-      print(e);
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -58,12 +75,13 @@ class _LoginScreenState extends State<LoginScreen> {
               children: <Widget>[
                 // Logo
                 ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                        300.0), // Adjust the radius as needed
-                    child: Image.asset(
-                      'assets/logo.png',
-                      height: 350,
-                    )),
+                  borderRadius: BorderRadius.circular(
+                      300.0), // Adjust the radius as needed
+                  child: Image.asset(
+                    'assets/logo.png',
+                    height: 350,
+                  ),
+                ),
                 SizedBox(height: 40.0),
 
                 // Email TextField
@@ -72,7 +90,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Email',
+                    labelStyle: TextStyle(color: Colors.teal),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal),
+                    ),
                   ),
+                  cursorColor: Colors.teal,
                 ),
                 SizedBox(height: 20.0),
 
@@ -83,7 +106,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Password',
+                    labelStyle: TextStyle(color: Colors.teal),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.teal),
+                    ),
                   ),
+                  cursorColor: Colors.teal,
                 ),
                 SizedBox(height: 10.0),
 
@@ -92,7 +120,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: _forgotPassword,
-                    child: Text('Forgot Password?'),
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(color: Colors.teal),
+                    ),
                   ),
                 ),
 
@@ -101,8 +132,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Login Button
                 ElevatedButton(
                   onPressed: _login,
-                  child: Text('Login'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                  ),
+                  child: _isLoading
+                      ? CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        )
+                      : Text(
+                          'Login',
+                          style: TextStyle(color: Colors.white),
+                        ),
                 ),
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Text(
+                      _errorMessage,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
                 SizedBox(height: 20.0),
               ],
             ),
