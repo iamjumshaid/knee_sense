@@ -2,10 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'partials/doctor_header.dart';
 import 'partials/doctor_footer.dart';
+import 'partials/assign_exercise_to_patients.dart';
 
 class DoctorExercisesPage extends StatelessWidget {
   void _navigateToAddExercise(BuildContext context) {
     // Implement navigation to the add exercise screen
+  }
+
+  void _showAssignExerciseDialog(BuildContext context, String exerciseId) {
+    showDialog(
+      context: context,
+      builder: (context) => AssignExerciseToPatients(exerciseId: exerciseId),
+    );
   }
 
   @override
@@ -124,9 +132,7 @@ class DoctorExercisesPage extends StatelessWidget {
                             Align(
                               alignment: Alignment.bottomRight,
                               child: ElevatedButton.icon(
-                                onPressed: () {
-                                  // Implement assign functionality
-                                },
+                                onPressed: () => _showAssignExerciseDialog(context, doc.id),
                                 icon: Icon(Icons.assignment_ind, color: Colors.white, size: 18),
                                 label: Text('Assign', style: TextStyle(color: Colors.white)),
                                 style: ElevatedButton.styleFrom(
