@@ -142,7 +142,13 @@ class DoctorHomePage extends StatelessWidget {
       bottomNavigationBar: AppFooter(
         currentIndex: 0,
         onTap: (index) {
-          // Handle navigation here
+          if (index == 0) {
+            // Already on home page, do nothing
+          } else if (index == 1) {
+            Navigator.pushNamed(context, '/exercises');
+          } else if (index == 2) {
+            // Implement navigation to profile page
+          }
         },
       ),
     );
