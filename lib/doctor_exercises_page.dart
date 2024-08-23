@@ -3,10 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'partials/doctor_header.dart';
 import 'partials/doctor_footer.dart';
 import 'partials/assign_exercise_to_patients.dart';
+import 'add_exercise_page.dart';
 
 class DoctorExercisesPage extends StatelessWidget {
   void _navigateToAddExercise(BuildContext context) {
-    // Implement navigation to the add exercise screen
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => AddExercisePage()),
+    );
   }
 
   void _showAssignExerciseDialog(BuildContext context, String exerciseId) {
