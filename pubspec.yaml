@@ -70,6 +70,7 @@ flutter:
   assets:
     - assets/logo.png
     - assets/ideal_wear.png
+    - assets/how_to_perform.gif
 
   # To add assets to your application, add an assets section, like this:
   # assets:

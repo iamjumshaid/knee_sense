@@ -4,14 +4,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'partials/doctor_header.dart';
 import 'partials/patient_footer.dart';
 import 'patient_caliberation.dart';
+import 'exercise_page.dart';
 
 class PatientHomePage extends StatelessWidget {
   final String userId;
 
   PatientHomePage({required this.userId});
 
-  void _navigateToExercise(BuildContext context, String exerciseId) {
-    // Implement navigation to the exercise detail page
+  void _navigateToExercise(BuildContext context, String exerciseId,
+      String exerciseName, String instructions) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ExercisePage(
+          exerciseId: exerciseId,
+          exerciseName: exerciseName,
+          instructions: instructions,
+          patientId: userId,
+        ),
+      ),
+    );
   }
 
   void _navigateToCaliberation(BuildContext context) {
@@ -28,7 +40,10 @@ class PatientHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppHeader(title: 'Patient Home'),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').doc(userId).snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -80,7 +95,10 @@ class PatientHomePage extends StatelessWidget {
                 SizedBox(height: 10),
                 Expanded(
                   child: StreamBuilder(
-                    stream: FirebaseFirestore.instance.collection('assigned_exercises').where('patient_id', isEqualTo: userId).snapshots(),
+                    stream: FirebaseFirestore.instance
+                        .collection('assigned_exercises')
+                        .where('patient_id', isEqualTo: userId)
+                        .snapshots(),
                     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
@@ -89,21 +107,32 @@ class PatientHomePage extends StatelessWidget {
                         return Center(child: Text('No exercises assigned.'));
                       }
                       return ListView(
-                        children: snapshot.data!.docs.map((assignedExerciseDoc) {
-                          var assignedExerciseData = assignedExerciseDoc.data() as Map<String, dynamic>;
-                          String exerciseId = assignedExerciseData['exercise_id'];
+                        children:
+                            snapshot.data!.docs.map((assignedExerciseDoc) {
+                          var assignedExerciseData = assignedExerciseDoc.data()
+                              as Map<String, dynamic>;
+                          String exerciseId =
+                              assignedExerciseData['exercise_id'];
                           String comment = assignedExerciseData['comment'];
 
                           return FutureBuilder<DocumentSnapshot>(
-                            future: FirebaseFirestore.instance.collection('doc_exercises').doc(exerciseId).get(),
+                            future: FirebaseFirestore.instance
+                                .collection('doc_exercises')
+                                .doc(exerciseId)
+                                .get(),
                             builder: (context, exerciseSnapshot) {
-                              if (exerciseSnapshot.connectionState == ConnectionState.waiting) {
-                                return Center(child: CircularProgressIndicator());
+                              if (exerciseSnapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child: CircularProgressIndicator());
                               }
-                              if (!exerciseSnapshot.hasData || !exerciseSnapshot.data!.exists) {
-                                return ListTile(title: Text('Exercise not found'));
+                              if (!exerciseSnapshot.hasData ||
+                                  !exerciseSnapshot.data!.exists) {
+                                return ListTile(
+                                    title: Text('Exercise not found'));
                               }
-                              var exerciseData = exerciseSnapshot.data!.data() as Map<String, dynamic>;
+                              var exerciseData = exerciseSnapshot.data!.data()
+                                  as Map<String, dynamic>;
                               String exerciseName = exerciseData['name'];
 
                               return Container(
@@ -111,14 +140,18 @@ class PatientHomePage extends StatelessWidget {
                                 padding: EdgeInsets.all(12.0),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10.0),
-                                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                  color: Theme.of(context)
+                                      .primaryColor
+                                      .withOpacity(0.1),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
                                       children: [
-                                        Icon(Icons.fitness_center, color: Theme.of(context).primaryColor),
+                                        Icon(Icons.fitness_center,
+                                            color:
+                                                Theme.of(context).primaryColor),
                                         SizedBox(width: 10),
                                         Expanded(
                                           child: Text(
@@ -133,9 +166,12 @@ class PatientHomePage extends StatelessWidget {
                                     ),
                                     SizedBox(height: 5),
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Icon(Icons.info_outline, color: Theme.of(context).primaryColor),
+                                        Icon(Icons.info_outline,
+                                            color:
+                                                Theme.of(context).primaryColor),
                                         SizedBox(width: 5),
                                         Expanded(
                                           child: Text(
@@ -152,15 +188,33 @@ class PatientHomePage extends StatelessWidget {
                                     Align(
                                       alignment: Alignment.bottomRight,
                                       child: ElevatedButton.icon(
-                                        onPressed: isCalibrated ? () => _navigateToExercise(context, exerciseId) : null,
-                                        icon: Icon(Icons.play_arrow, size: 20, color: Theme.of(context).colorScheme.onPrimary,),
-                                        label: Text('Start exercise',
-                                        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),),
+                                        onPressed: isCalibrated
+                                            ? () => _navigateToExercise(
+                                                context, exerciseId, exerciseName, comment)
+                                            : null,
+                                        icon: Icon(
+                                          Icons.play_arrow,
+                                          size: 20,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
+                                        ),
+                                        label: Text(
+                                          'Start exercise',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onPrimary),
+                                        ),
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: isCalibrated ? Theme.of(context).primaryColor : Colors.grey,
-                                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                          backgroundColor: isCalibrated
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.grey,
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 8, horizontal: 16),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10.0),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
                                           ),
                                         ),
                                       ),
