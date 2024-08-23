@@ -35,11 +35,19 @@ class _LoginScreenState extends State<LoginScreen> {
         if (userDoc.exists) {
           bool isPatient = userDoc['is_patient'];
           if (isPatient) {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => PatientHomePage()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PatientHomePage(userId: user.uid),
+              ),
+            );
           } else {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => DoctorHomePage()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DoctorHomePage(),
+              ),
+            );
           }
         } else {
           setState(() {
