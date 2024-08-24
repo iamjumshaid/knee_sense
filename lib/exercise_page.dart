@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';  // For JSON decoding
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;  // For HTTP requests
 import 'partials/doctor_header.dart';
 
 class ExercisePage extends StatefulWidget {
@@ -22,15 +24,19 @@ class ExercisePage extends StatefulWidget {
 
 class _ExercisePageState extends State<ExercisePage> {
   late Timer _timer;
+  late Timer _dataFetchTimer;
   int _seconds = 0;
   String imageUrl = '';
   String howToInstructions = '';
+  String angle = '0.0';  // Changed to String
+  String temperature = '0.0';  // Changed to String
 
   @override
   void initState() {
     super.initState();
     _startTimer();
     _loadDocExerciseData();
+    _startDataFetchTimer();  // Start periodic data fetching
   }
 
   void _startTimer() {
@@ -59,6 +65,32 @@ class _ExercisePageState extends State<ExercisePage> {
     }
   }
 
+  void _startDataFetchTimer() {
+    _dataFetchTimer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      _fetchRealtimeData();
+    });
+  }
+
+  Future<void> _fetchRealtimeData() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://knee-sense-default-rtdb.europe-west1.firebasedatabase.app/.json'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          angle = data['Angle']['Angle'].toString();
+          temperature = data['Temp']['mean'].toString();
+        });
+      } else {
+        print('Failed to load real-time data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching real-time data: $e');
+    }
+  }
+
   String _formatTime(int seconds) {
     int minutes = seconds ~/ 60;
     int remainingSeconds = seconds % 60;
@@ -67,6 +99,7 @@ class _ExercisePageState extends State<ExercisePage> {
 
   void _finishExercise(BuildContext context) {
     _timer.cancel();
+    _dataFetchTimer.cancel();
     _showFeedbackDialog(context);
   }
 
@@ -209,6 +242,7 @@ class _ExercisePageState extends State<ExercisePage> {
   @override
   void dispose() {
     _timer.cancel();
+    _dataFetchTimer.cancel();
     super.dispose();
   }
 
@@ -279,40 +313,41 @@ class _ExercisePageState extends State<ExercisePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.timer, color: Theme.of(context).primaryColor),
-                    SizedBox(width: 5),
-                    Text(
-                      'Time: ${_formatTime(_seconds)}',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.timer, color: Theme.of(context).primaryColor),
+                      SizedBox(width: 5),
+                      Text(
+                        'Time: ${_formatTime(_seconds)}',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-                Row(
-                  children: [
-                    Icon(Icons.rotate_right,
-                        color: Theme.of(context).primaryColor),
-                    SizedBox(width: 5),
-                    Text(
-                      'Angle: 90°',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.rotate_right, color: Theme.of(context).primaryColor),
+                      SizedBox(width: 5),
+                      Text(
+                        'Angle: $angle°',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-                Row(
-                  children: [
-                    Icon(Icons.thermostat,
-                        color: Theme.of(context).primaryColor),
-                    SizedBox(width: 5),
-                    Text(
-                      'Temp: 37°C',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.thermostat, color: Theme.of(context).primaryColor),
+                      SizedBox(width: 5),
+                      Text(
+                        'Temp: $temperature°C',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
