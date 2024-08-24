@@ -35,8 +35,21 @@ class PatientDetailPage extends StatelessWidget {
     );
   }
 
+  Future<String> _getExerciseName(String exerciseId) async {
+    DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
+        .collection('doc_exercises')
+        .doc(exerciseId)
+        .get();
+    if (docSnapshot.exists) {
+      return docSnapshot['name'];
+    } else {
+      return 'Unknown Exercise';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(this.patientId);
     return Scaffold(
       appBar: AppHeader(title: 'Patient Detail'),
       body: Padding(
@@ -116,100 +129,100 @@ class PatientDetailPage extends StatelessWidget {
                   }
                   return ListView(
                     children: snapshot.data!.docs.map((doc) {
-                      return GestureDetector(
-                        onTap: () => _navigateToExerciseDetail(context, doc),
-                        child: Container(
-                          margin: EdgeInsets.symmetric(vertical: 8.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15.0),
-                            gradient: LinearGradient(
-                              colors: [
-                                Theme.of(context).primaryColor.withOpacity(0.15),
-                                Theme.of(context).primaryColor.withOpacity(0.2),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+                      String exerciseId = doc['exercise_id'];
+                      return FutureBuilder<String>(
+                        future: _getExerciseName(exerciseId),
+                        builder: (context, asyncSnapshot) {
+                          if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          String exerciseName = asyncSnapshot.data ?? 'Unknown Exercise';
+                          return GestureDetector(
+                            onTap: () => _navigateToExerciseDetail(context, doc),
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15.0),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context).primaryColor.withOpacity(0.15),
+                                    Theme.of(context).primaryColor.withOpacity(0.2),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundColor: Theme.of(context).primaryColor,
+                                          child: Icon(Icons.fitness_center, color: Colors.white),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          exerciseName,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.date_range, color: Theme.of(context).primaryColor),
+                                        SizedBox(width: 5),
+                                        Text('Date: ${formatDate(doc['timestamp'])}'),
+                                      ],
+                                    ),
+                                    SizedBox(height: 5),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.timer, color: Theme.of(context).primaryColor),
+                                        SizedBox(width: 5),
+                                        Text('Time taken: ${doc['time_taken']} minutes'),
+                                      ],
+                                    ),
+                                    SizedBox(height: 5),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.sentiment_satisfied, color: Theme.of(context).primaryColor),
+                                        SizedBox(width: 5),
+                                        Text('How patient felt: '),
+                                        Icon(
+                                          Icons.sentiment_very_dissatisfied,
+                                          color: doc['emotion'] == 'very_dissatisfied' ? Colors.red : Colors.grey,
+                                        ),
+                                        Icon(
+                                          Icons.sentiment_dissatisfied,
+                                          color: doc['emotion'] == 'dissatisfied' ? Colors.orange : Colors.grey,
+                                        ),
+                                        Icon(
+                                          Icons.sentiment_neutral,
+                                          color: doc['emotion'] == 'neutral' ? Colors.yellow : Colors.grey,
+                                        ),
+                                        Icon(
+                                          Icons.sentiment_satisfied,
+                                          color: doc['emotion'] == 'satisfied' ? Colors.lightGreen : Colors.grey,
+                                        ),
+                                        Icon(
+                                          Icons.sentiment_very_satisfied,
+                                          color: doc['emotion'] == 'very_satisfied' ? Colors.green : Colors.grey,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: Theme.of(context).primaryColor,
-                                      child: Icon(Icons.fitness_center, color: Colors.white),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      doc['exercise_name'],
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Icon(Icons.date_range, color: Theme.of(context).primaryColor),
-                                    SizedBox(width: 5),
-                                    Text('Date: ${formatDate(doc['date'])}'),
-                                  ],
-                                ),
-                                SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    Icon(Icons.timer, color: Theme.of(context).primaryColor),
-                                    SizedBox(width: 5),
-                                    Text('Time taken: ${doc['time_taken']} minutes'),
-                                  ],
-                                ),
-                                SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    Icon(Icons.sentiment_satisfied, color: Theme.of(context).primaryColor),
-                                    SizedBox(width: 5),
-                                    Text('How patient felt: '),
-                                    Icon(
-                                      Icons.sentiment_very_dissatisfied,
-                                      color: doc['emotion'] == 'very_dissatisfied'
-                                          ? Colors.red
-                                          : Colors.grey,
-                                    ),
-                                    Icon(
-                                      Icons.sentiment_dissatisfied,
-                                      color: doc['emotion'] == 'dissatisfied'
-                                          ? Colors.orange
-                                          : Colors.grey,
-                                    ),
-                                    Icon(
-                                      Icons.sentiment_neutral,
-                                      color: doc['emotion'] == 'neutral'
-                                          ? Colors.yellow
-                                          : Colors.grey,
-                                    ),
-                                    Icon(
-                                      Icons.sentiment_satisfied,
-                                      color: doc['emotion'] == 'satisfied'
-                                          ? Colors.lightGreen
-                                          : Colors.grey,
-                                    ),
-                                    Icon(
-                                      Icons.sentiment_very_satisfied,
-                                      color: doc['emotion'] == 'very_satisfied'
-                                          ? Colors.green
-                                          : Colors.grey,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                          );
+                        },
                       );
                     }).toList(),
                   );

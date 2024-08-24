@@ -5,6 +5,7 @@ import 'partials/doctor_header.dart';
 import 'partials/patient_footer.dart';
 import 'patient_caliberation.dart';
 import 'exercise_page.dart';
+import 'patient_exercises_history.dart';
 
 class PatientHomePage extends StatelessWidget {
   final String userId;
@@ -33,6 +34,13 @@ class PatientHomePage extends StatelessWidget {
         builder: (context) => PatientCaliberationPage(userId: userId),
       ),
     );
+  }
+
+  void _navigateToExerciseHistory(BuildContext context) {
+    Navigator.push(
+      context,
+        MaterialPageRoute(builder: (context) => PatientExercisesHistoryPage()),
+      );
   }
 
   @override
@@ -190,7 +198,10 @@ class PatientHomePage extends StatelessWidget {
                                       child: ElevatedButton.icon(
                                         onPressed: isCalibrated
                                             ? () => _navigateToExercise(
-                                                context, exerciseId, exerciseName, comment)
+                                                context,
+                                                exerciseId,
+                                                exerciseName,
+                                                comment)
                                             : null,
                                         icon: Icon(
                                           Icons.play_arrow,
@@ -242,7 +253,7 @@ class PatientHomePage extends StatelessWidget {
           } else if (index == 1) {
             _navigateToCaliberation(context);
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/exercises');
+            _navigateToExerciseHistory(context);
           }
         },
       ),

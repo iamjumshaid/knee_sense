@@ -18,11 +18,12 @@ class DoctorHomePage extends StatelessWidget {
   }
 
   void _navigateToPatientDetail(BuildContext context, DocumentSnapshot doc) {
+    // Here, we pass the patient ID and other details to the PatientDetailPage
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => PatientDetailPage(
-          patientId: doc.id,
+          patientId: doc['patient_id'],  // Pass the document ID (patient ID)
           name: doc['name'],
           contact: doc['contact'],
           problem: doc['problem'],
