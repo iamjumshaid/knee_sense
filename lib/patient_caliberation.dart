@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'partials/doctor_header.dart';
 import 'partials/patient_footer.dart';
 
@@ -63,13 +62,17 @@ class PatientCaliberationPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            // Step-by-step instructions left aligned
+            // Updated Step-by-step instructions
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('1. First instruction', style: TextStyle(fontSize: 16)),
+                Text('1. Prepare: Make sure the knee area is clean and dry.', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 10),
-                Text('2. Second instruction', style: TextStyle(fontSize: 16)),
+                Text('2. Position: Align the orthosis over your knee joint, ensuring that the sensors are correctly positioned.', style: TextStyle(fontSize: 16)),
+                SizedBox(height: 10),
+                Text('3. Secure: Fasten the straps snugly around your leg, ensuring a comfortable yet firm fit, without restricting blood flow.', style: TextStyle(fontSize: 16)),
+                SizedBox(height: 10),
+                Text('4. Check: Confirm that the orthosis is properly aligned and provides support without causing discomfort.', style: TextStyle(fontSize: 16)),
               ],
             ),
             Spacer(),
