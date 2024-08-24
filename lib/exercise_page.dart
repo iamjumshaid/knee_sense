@@ -28,8 +28,8 @@ class _ExercisePageState extends State<ExercisePage> {
   int _seconds = 0;
   String imageUrl = '';
   String howToInstructions = '';
-  String angle = '0.0';  // Changed to String
-  String temperature = '0.0';  // Changed to String
+  String angle = '0.00';  // Rounded to 2 decimal places
+  String temperature = '0.00';  // Rounded to 2 decimal places
 
   @override
   void initState() {
@@ -80,8 +80,8 @@ class _ExercisePageState extends State<ExercisePage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          angle = data['Angle']['Angle'].toString();
-          temperature = data['Temp']['mean'].toString();
+          angle = data['Angle']['Angle'].toStringAsFixed(2);
+          temperature = data['Temp']['mean'].toStringAsFixed(2);
         });
       } else {
         print('Failed to load real-time data: ${response.statusCode}');
@@ -318,33 +318,41 @@ class _ExercisePageState extends State<ExercisePage> {
                     children: [
                       Icon(Icons.timer, color: Theme.of(context).primaryColor),
                       SizedBox(width: 5),
-                      Text(
-                        'Time: ${_formatTime(_seconds)}',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          'Time: ${_formatTime(_seconds)}',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ],
                   ),
                 ),
+                SizedBox(width: 10),
                 Expanded(
                   child: Row(
                     children: [
                       Icon(Icons.rotate_right, color: Theme.of(context).primaryColor),
                       SizedBox(width: 5),
-                      Text(
-                        'Angle: $angle°',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          'Angle: $angle°',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ],
                   ),
                 ),
+                SizedBox(width: 10),
                 Expanded(
                   child: Row(
                     children: [
                       Icon(Icons.thermostat, color: Theme.of(context).primaryColor),
                       SizedBox(width: 5),
-                      Text(
-                        'Temp: $temperature°C',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          'Temp: $temperature°C',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ],
                   ),
