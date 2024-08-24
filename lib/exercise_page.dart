@@ -31,6 +31,10 @@ class _ExercisePageState extends State<ExercisePage> {
   String angle = '0.00';  // Rounded to 2 decimal places
   String temperature = '0.00';  // Rounded to 2 decimal places
 
+  // JSON maps to store the time-series data
+  Map<String, String> angleData = {};
+  Map<String, String> temperatureData = {};
+
   @override
   void initState() {
     super.initState();
@@ -82,6 +86,10 @@ class _ExercisePageState extends State<ExercisePage> {
         setState(() {
           angle = data['Angle']['Angle'].toStringAsFixed(2);
           temperature = data['Temp']['mean'].toStringAsFixed(2);
+
+          // Store data in the maps
+          angleData[_seconds.toString()] = angle;
+          temperatureData[_seconds.toString()] = temperature;
         });
       } else {
         print('Failed to load real-time data: ${response.statusCode}');
@@ -230,6 +238,8 @@ class _ExercisePageState extends State<ExercisePage> {
         'comments': comments,
         'time_taken': timeTaken,
         'timestamp': Timestamp.now(),
+        'angle_data': angleData,
+        'temperature_data': temperatureData,
       });
       Navigator.of(context).pop(); // Close the feedback dialog
       Navigator.of(context).pop(); // Close the exercise screen
