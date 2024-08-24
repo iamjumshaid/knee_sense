@@ -47,34 +47,38 @@ class _AddExercisePageState extends State<AddExercisePage> {
       String imageUrl = '';
       String videoUrl = '';
 
-      // Upload image if selected
-      if (_image != null) {
-        final ref = FirebaseStorage.instance.ref().child('exercise_images/${DateTime.now().toIso8601String()}');
-        await ref.putFile(_image!);
-        imageUrl = await ref.getDownloadURL();
+      try {
+        // Upload image if selected
+        if (_image != null) {
+          final ref = FirebaseStorage.instance.ref().child('exercise_images/${DateTime.now().toIso8601String()}');
+          await ref.putFile(_image!);
+          imageUrl = await ref.getDownloadURL();
+        }
+
+        // Upload video if selected
+        if (_video != null) {
+          final ref = FirebaseStorage.instance.ref().child('exercise_videos/${DateTime.now().toIso8601String()}');
+          await ref.putFile(_video!);
+          videoUrl = await ref.getDownloadURL();
+        }
+
+        // Add exercise to Firestore
+        await FirebaseFirestore.instance.collection('doc_exercises').add({
+          'name': _nameController.text,
+          'target_area': _targetMuscleController.text,
+          'instructions': _instructionsController.text,
+          'url': _urlController.text,
+          'imageUrl': imageUrl,
+          'videoUrl': videoUrl,
+          'timestamp': Timestamp.now(),
+        });
+
+        // Show success message and navigate back
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Exercise added successfully!')));
+        Navigator.of(context).pop();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add exercise: $e')));
       }
-
-      // Upload video if selected
-      if (_video != null) {
-        final ref = FirebaseStorage.instance.ref().child('exercise_videos/${DateTime.now().toIso8601String()}');
-        await ref.putFile(_video!);
-        videoUrl = await ref.getDownloadURL();
-      }
-
-      // Add exercise to Firestore
-      await FirebaseFirestore.instance.collection('doc_exercises').add({
-        'name': _nameController.text,
-        'targetMuscle': _targetMuscleController.text,
-        'instructions': _instructionsController.text,
-        'url': _urlController.text,
-        'imageUrl': imageUrl,
-        'videoUrl': videoUrl,
-        'timestamp': Timestamp.now(),
-      });
-
-      // Show success message and navigate back
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Exercise added successfully!')));
-      Navigator.of(context).pop();
     }
   }
 
