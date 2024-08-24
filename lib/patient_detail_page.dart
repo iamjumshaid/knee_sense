@@ -23,13 +23,15 @@ class PatientDetailPage extends StatelessWidget {
     return DateFormat('yyyy-MM-dd').format(date);
   }
 
-  void _navigateToExerciseDetail(BuildContext context, DocumentSnapshot doc) {
+  Future<void> _navigateToExerciseDetail(BuildContext context, DocumentSnapshot doc) async {
+    String exerciseId = doc['exercise_id'];
+    String exerciseName = await _getExerciseName(exerciseId);
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ExerciseDetailPage(
-          exerciseId: doc.id,
-          exerciseName: doc['exercise_name'],
+          exerciseId: exerciseId,
+          exerciseName: exerciseName,
         ),
       ),
     );
@@ -49,7 +51,6 @@ class PatientDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(this.patientId);
     return Scaffold(
       appBar: AppHeader(title: 'Patient Detail'),
       body: Padding(

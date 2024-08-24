@@ -24,20 +24,20 @@ class ExerciseDetailPage extends StatelessWidget {
       appBar: AppHeader(title: 'Exercise Detail'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: StreamBuilder<DocumentSnapshot>(
+        child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('exercises')
-              .doc(exerciseId)
+              .where('exercise_id', isEqualTo: exerciseId)
               .snapshots(),
-          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             }
-            if (!snapshot.hasData || !snapshot.data!.exists) {
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return Center(child: Text('Exercise not found.'));
             }
 
-            var doc = snapshot.data!;
+            var doc = snapshot.data!.docs.first;
             var data = doc.data() as Map<String, dynamic>;
 
             var timeTaken = data.containsKey('time_taken') ? data['time_taken'] : 'N/A';
@@ -50,19 +50,22 @@ class ExerciseDetailPage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    SizedBox(width: 10),
                     CircleAvatar(
                       backgroundColor: Theme.of(context).primaryColor,
                       child: Icon(Icons.fitness_center, color: Colors.white),
                       radius: 30,
                     ),
                     SizedBox(width: 20),
-                    Text(
-                      exerciseName,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                    Expanded(  // This will allow the text to wrap and prevent overflow
+                      child: Text(
+                        exerciseName,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 2,  // Limit to 2 lines if necessary
+                        overflow: TextOverflow.ellipsis,  // Add ellipsis if text is too long
                       ),
                     ),
                   ],
