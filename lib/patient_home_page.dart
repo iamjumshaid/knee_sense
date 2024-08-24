@@ -39,8 +39,18 @@ class PatientHomePage extends StatelessWidget {
   void _navigateToExerciseHistory(BuildContext context) {
     Navigator.push(
       context,
-        MaterialPageRoute(builder: (context) => PatientExercisesHistoryPage()),
-      );
+      MaterialPageRoute(builder: (context) => PatientExercisesHistoryPage()),
+    );
+  }
+
+  Future<bool> _isExerciseCompleted(String exerciseId) async {
+    QuerySnapshot exercisesSnapshot = await FirebaseFirestore.instance
+        .collection('exercises')
+        .where('exercise_id', isEqualTo: exerciseId)
+        .where('patient_id', isEqualTo: userId)
+        .get();
+
+    return exercisesSnapshot.docs.isNotEmpty;
   }
 
   @override
@@ -123,116 +133,138 @@ class PatientHomePage extends StatelessWidget {
                               assignedExerciseData['exercise_id'];
                           String comment = assignedExerciseData['comment'];
 
-                          return FutureBuilder<DocumentSnapshot>(
-                            future: FirebaseFirestore.instance
-                                .collection('doc_exercises')
-                                .doc(exerciseId)
-                                .get(),
-                            builder: (context, exerciseSnapshot) {
-                              if (exerciseSnapshot.connectionState ==
+                          return FutureBuilder<bool>(
+                            future: _isExerciseCompleted(exerciseId),
+                            builder: (context, futureSnapshot) {
+                              if (futureSnapshot.connectionState ==
                                   ConnectionState.waiting) {
                                 return Center(
                                     child: CircularProgressIndicator());
                               }
-                              if (!exerciseSnapshot.hasData ||
-                                  !exerciseSnapshot.data!.exists) {
-                                return ListTile(
-                                    title: Text('Exercise not found'));
-                              }
-                              var exerciseData = exerciseSnapshot.data!.data()
-                                  as Map<String, dynamic>;
-                              String exerciseName = exerciseData['name'];
+                              if (futureSnapshot.hasData &&
+                                  futureSnapshot.data == false) {
+                                return FutureBuilder<DocumentSnapshot>(
+                                  future: FirebaseFirestore.instance
+                                      .collection('doc_exercises')
+                                      .doc(exerciseId)
+                                      .get(),
+                                  builder: (context, exerciseSnapshot) {
+                                    if (exerciseSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                          child: CircularProgressIndicator());
+                                    }
+                                    if (!exerciseSnapshot.hasData ||
+                                        !exerciseSnapshot.data!.exists) {
+                                      return ListTile(
+                                          title: Text('Exercise not found'));
+                                    }
+                                    var exerciseData = exerciseSnapshot.data!
+                                        .data() as Map<String, dynamic>;
+                                    String exerciseName =
+                                        exerciseData['name'];
 
-                              return Container(
-                                margin: EdgeInsets.symmetric(vertical: 8.0),
-                                padding: EdgeInsets.all(12.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  color: Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.1),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.fitness_center,
-                                            color:
-                                                Theme.of(context).primaryColor),
-                                        SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            exerciseName,
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 5),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Icon(Icons.info_outline,
-                                            color:
-                                                Theme.of(context).primaryColor),
-                                        SizedBox(width: 5),
-                                        Expanded(
-                                          child: Text(
-                                            'Instructions: $comment',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black54,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: ElevatedButton.icon(
-                                        onPressed: isCalibrated
-                                            ? () => _navigateToExercise(
-                                                context,
-                                                exerciseId,
-                                                exerciseName,
-                                                comment)
-                                            : null,
-                                        icon: Icon(
-                                          Icons.play_arrow,
-                                          size: 20,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary,
-                                        ),
-                                        label: Text(
-                                          'Start exercise',
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimary),
-                                        ),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: isCalibrated
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.grey,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 8, horizontal: 16),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
-                                          ),
-                                        ),
+                                    return Container(
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 8.0),
+                                      padding: EdgeInsets.all(12.0),
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                        color: Theme.of(context)
+                                            .primaryColor
+                                            .withOpacity(0.1),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              );
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(Icons.fitness_center,
+                                                  color: Theme.of(context)
+                                                      .primaryColor),
+                                              SizedBox(width: 10),
+                                              Expanded(
+                                                child: Text(
+                                                  exerciseName,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Icon(Icons.info_outline,
+                                                  color: Theme.of(context)
+                                                      .primaryColor),
+                                              SizedBox(width: 5),
+                                              Expanded(
+                                                child: Text(
+                                                  'Instructions: $comment',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black54,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 10),
+                                          Align(
+                                            alignment: Alignment.bottomRight,
+                                            child: ElevatedButton.icon(
+                                              onPressed: isCalibrated
+                                                  ? () => _navigateToExercise(
+                                                      context,
+                                                      exerciseId,
+                                                      exerciseName,
+                                                      comment)
+                                                  : null,
+                                              icon: Icon(
+                                                Icons.play_arrow,
+                                                size: 20,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary,
+                                              ),
+                                              label: Text(
+                                                'Start exercise',
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onPrimary),
+                                              ),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: isCalibrated
+                                                    ? Theme.of(context)
+                                                        .primaryColor
+                                                    : Colors.grey,
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 8,
+                                                    horizontal: 16),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                              return Container(); // Return an empty container if the exercise is already completed
                             },
                           );
                         }).toList(),

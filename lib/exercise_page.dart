@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'partials/doctor_header.dart';
 
 class ExercisePage extends StatefulWidget {
   final String exerciseId;
   final String exerciseName;
-  final String instructions;
+  final String instructions;  // Doctor's instructions
   final String patientId;
 
-  ExercisePage(
-      {required this.exerciseId,
-      required this.exerciseName,
-      required this.instructions,
-      required this.patientId});
+  ExercisePage({
+    required this.exerciseId,
+    required this.exerciseName,
+    required this.instructions,
+    required this.patientId,
+  });
 
   @override
   _ExercisePageState createState() => _ExercisePageState();
@@ -23,11 +23,14 @@ class ExercisePage extends StatefulWidget {
 class _ExercisePageState extends State<ExercisePage> {
   late Timer _timer;
   int _seconds = 0;
+  String imageUrl = '';
+  String howToInstructions = '';
 
   @override
   void initState() {
     super.initState();
     _startTimer();
+    _loadDocExerciseData();
   }
 
   void _startTimer() {
@@ -36,6 +39,24 @@ class _ExercisePageState extends State<ExercisePage> {
         _seconds++;
       });
     });
+  }
+
+  Future<void> _loadDocExerciseData() async {
+    try {
+      DocumentSnapshot docExerciseSnapshot = await FirebaseFirestore.instance
+          .collection('doc_exercises')
+          .doc(widget.exerciseId)
+          .get();
+
+      if (docExerciseSnapshot.exists) {
+        setState(() {
+          imageUrl = docExerciseSnapshot['imageUrl'] ?? '';
+          howToInstructions = docExerciseSnapshot['instructions'] ?? 'No instructions provided.';
+        });
+      }
+    } catch (e) {
+      print('Failed to load exercise data: $e');
+    }
   }
 
   String _formatTime(int seconds) {
@@ -210,12 +231,18 @@ class _ExercisePageState extends State<ExercisePage> {
               ),
             ),
             SizedBox(height: 20),
-            // GIF in the middle
+            // Display Image from Firestore or a Placeholder if not available
             Center(
-              child: Image.asset(
-                'assets/how_to_perform.gif',
-                height: 200, // Adjust the height as necessary
-              ),
+              child: imageUrl.isNotEmpty
+                  ? Image.network(
+                      imageUrl,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      'assets/how_to_perform.gif',
+                      height: 200,
+                    ),
             ),
             SizedBox(height: 30),
             // Doctor's Instructions
@@ -230,6 +257,21 @@ class _ExercisePageState extends State<ExercisePage> {
             SizedBox(height: 10),
             Text(
               widget.instructions,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 30),
+            // How to do Instructions
+            Text(
+              'How to do:',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              howToInstructions.isNotEmpty ? howToInstructions : 'No instructions provided.',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 30),
