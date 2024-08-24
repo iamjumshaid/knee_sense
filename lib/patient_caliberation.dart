@@ -20,7 +20,7 @@ class PatientCaliberationPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Calibration complete!')));
 
       // Navigate back to the home page or another appropriate page
-      Navigator.pop(context);
+      Navigator.pushNamed(context, '/patient_home');  // Changed from pop to pushNamed
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to complete calibration: $e')));
     }
@@ -77,6 +77,7 @@ class PatientCaliberationPage extends StatelessWidget {
             Center(
               child: ElevatedButton.icon(
                 onPressed: () => _completeCaliberation(context),
+                icon: Icon(Icons.check, color: Colors.white), // Added an icon
                 label: Text('Done', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
@@ -95,7 +96,7 @@ class PatientCaliberationPage extends StatelessWidget {
         currentIndex: 1,
         onTap: (index) {
           if (index == 0) {
-            Navigator.pushNamed(context, '/home');
+            Navigator.pushNamed(context, '/patient_home');
           } else if (index == 1) {
             // Already on Calibration page, do nothing
           } else if (index == 2) {
