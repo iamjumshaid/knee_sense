@@ -20,18 +20,34 @@ class ExerciseDetailPage extends StatelessWidget {
   }
 
   List<FlSpot> _createFlSpots(Map<String, String> data) {
-    final List<FlSpot> spots = [];
+    final Map<int, List<double>> intervalData = {};
+
+    // Group data into 10-second intervals
     data.forEach((key, value) {
-      double x = double.tryParse(key) ?? 0.0;
-      double y = double.tryParse(value) ?? 0.0;
-      spots.add(FlSpot(x, y));
+      int time = int.tryParse(key) ?? 0;
+      double angle = double.tryParse(value) ?? 0.0;
+      int interval = (time ~/ 10) * 10;
+
+      if (!intervalData.containsKey(interval)) {
+        intervalData[interval] = [];
+      }
+      intervalData[interval]!.add(angle);
     });
+
+    // Create average FlSpots for each interval
+    final List<FlSpot> spots = [];
+    intervalData.forEach((interval, angles) {
+      double averageAngle = angles.reduce((a, b) => a + b) / angles.length;
+      spots.add(FlSpot(interval.toDouble(), averageAngle));
+    });
+
     return spots;
   }
 
   Widget _buildLineChart(List<FlSpot> spots, Color color, String xAxisLabel, String yAxisLabel) {
     final double minY = spots.isNotEmpty ? spots.map((e) => e.y).reduce((a, b) => a < b ? a : b) - 1 : 0;
     final double maxY = spots.isNotEmpty ? spots.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 1 : 1;
+    final double maxX = spots.isNotEmpty ? spots.last.x : 0;
 
     return LineChart(
       LineChartData(
@@ -40,7 +56,12 @@ class ExerciseDetailPage extends StatelessWidget {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
+              interval: 20,  // Increase interval to reduce the number of Y-axis labels
               getTitlesWidget: (value, meta) {
+                // Skip the overlapping Y-axis value `82.3`
+                if (value == 82.3 || value == 80.0 || value == 78.0) {
+                  return Container();
+                }
                 return Text(value.toStringAsFixed(1), style: TextStyle(fontSize: 12));
               },
               reservedSize: 40,
@@ -51,19 +72,25 @@ class ExerciseDetailPage extends StatelessWidget {
             ),
             axisNameSize: 20,
           ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),  // Hide right Y-axis labels
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
+              reservedSize: 50,  // Increased to allow full visibility of the last X-axis value
               getTitlesWidget: (value, meta) {
                 return Text(value.toInt().toString(), style: TextStyle(fontSize: 12));
               },
-              reservedSize: 40,
             ),
             axisNameWidget: Text(
               xAxisLabel,
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             axisNameSize: 20,
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),  // Hide top X-axis labels
           ),
         ),
         borderData: FlBorderData(
@@ -80,7 +107,7 @@ class ExerciseDetailPage extends StatelessWidget {
           ),
         ],
         minX: 0,
-        maxX: spots.isNotEmpty ? spots.last.x : 0,
+        maxX: maxX,
         minY: minY,
         maxY: maxY,
       ),
@@ -212,7 +239,7 @@ class ExerciseDetailPage extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    height: 300,  // Increased the height
+                    height: 300,  // Restored the original height
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: _buildLineChart(
                       _createFlSpots(angleData.cast<String, String>()),
@@ -231,7 +258,7 @@ class ExerciseDetailPage extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    height: 300,  // Increased the height
+                    height: 300,  // Restored the original height
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: _buildLineChart(
                       _createFlSpots(temperatureData.cast<String, String>()),
