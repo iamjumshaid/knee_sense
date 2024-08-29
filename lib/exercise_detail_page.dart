@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:fl_chart/fl_chart.dart';  // Import fl_chart package
+import 'package:fl_chart/fl_chart.dart'; // Import fl_chart package
 import 'partials/doctor_header.dart';
 import 'partials/doctor_footer.dart';
 
@@ -44,9 +44,14 @@ class ExerciseDetailPage extends StatelessWidget {
     return spots;
   }
 
-  Widget _buildLineChart(List<FlSpot> spots, Color color, String xAxisLabel, String yAxisLabel) {
-    final double minY = spots.isNotEmpty ? spots.map((e) => e.y).reduce((a, b) => a < b ? a : b) - 1 : 0;
-    final double maxY = spots.isNotEmpty ? spots.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 1 : 1;
+  Widget _buildLineChart(
+      List<FlSpot> spots, Color color, String xAxisLabel, String yAxisLabel) {
+    final double minY = spots.isNotEmpty
+        ? spots.map((e) => e.y).reduce((a, b) => a < b ? a : b) - 1
+        : 0;
+    final double maxY = spots.isNotEmpty
+        ? spots.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 1
+        : 1;
     final double maxX = spots.isNotEmpty ? spots.last.x : 0;
 
     return LineChart(
@@ -56,13 +61,15 @@ class ExerciseDetailPage extends StatelessWidget {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: 20,  // Increase interval to reduce the number of Y-axis labels
+              interval:
+                  20, // Increase interval to reduce the number of Y-axis labels
               getTitlesWidget: (value, meta) {
                 // Skip the overlapping Y-axis value `82.3`
                 if (value == 82.3 || value == 80.0 || value == 78.0) {
                   return Container();
                 }
-                return Text(value.toStringAsFixed(1), style: TextStyle(fontSize: 12));
+                return Text(value.toStringAsFixed(1),
+                    style: TextStyle(fontSize: 12));
               },
               reservedSize: 40,
             ),
@@ -73,14 +80,17 @@ class ExerciseDetailPage extends StatelessWidget {
             axisNameSize: 20,
           ),
           rightTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: false),  // Hide right Y-axis labels
+            sideTitles:
+                SideTitles(showTitles: false), // Hide right Y-axis labels
           ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 50,  // Increased to allow full visibility of the last X-axis value
+              reservedSize:
+                  50, // Increased to allow full visibility of the last X-axis value
               getTitlesWidget: (value, meta) {
-                return Text(value.toInt().toString(), style: TextStyle(fontSize: 12));
+                return Text(value.toInt().toString(),
+                    style: TextStyle(fontSize: 12));
               },
             ),
             axisNameWidget: Text(
@@ -90,7 +100,7 @@ class ExerciseDetailPage extends StatelessWidget {
             axisNameSize: 20,
           ),
           topTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: false),  // Hide top X-axis labels
+            sideTitles: SideTitles(showTitles: false), // Hide top X-axis labels
           ),
         ),
         borderData: FlBorderData(
@@ -136,12 +146,16 @@ class ExerciseDetailPage extends StatelessWidget {
             var doc = snapshot.data!.docs.first;
             var data = doc.data() as Map<String, dynamic>;
 
-            var timeTaken = data.containsKey('time_taken') ? data['time_taken'] : 'N/A';
+            var timeTaken =
+                data.containsKey('time_taken') ? data['time_taken'] : 'N/A';
             var sets = data.containsKey('sets') ? data['sets'] : 'N/A';
-            var comments = data.containsKey('comments') ? data['comments'] : 'No comments';
-            var emotion = data.containsKey('emotion') ? data['emotion'] : 'neutral';
+            var comments =
+                data.containsKey('comments') ? data['comments'] : 'No comments';
+            var emotion =
+                data.containsKey('emotion') ? data['emotion'] : 'neutral';
             var angleData = data['angle_data'] as Map<String, dynamic>? ?? {};
-            var temperatureData = data['temperature_data'] as Map<String, dynamic>? ?? {};
+            var temperatureData =
+                data['temperature_data'] as Map<String, dynamic>? ?? {};
 
             return SingleChildScrollView(
               child: Column(
@@ -176,7 +190,8 @@ class ExerciseDetailPage extends StatelessWidget {
                       SizedBox(width: 5),
                       Text('Time: $timeTaken minutes'),
                       SizedBox(width: 20),
-                      Icon(Icons.format_list_numbered, color: Theme.of(context).primaryColor),
+                      Icon(Icons.format_list_numbered,
+                          color: Theme.of(context).primaryColor),
                       SizedBox(width: 5),
                       Text('Sets: $sets'),
                     ],
@@ -195,23 +210,32 @@ class ExerciseDetailPage extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.sentiment_very_dissatisfied,
-                        color: emotion == 'very_dissatisfied' ? Colors.red : Colors.grey,
+                        color: emotion == 'very_dissatisfied'
+                            ? Colors.red
+                            : Colors.grey,
                       ),
                       Icon(
                         Icons.sentiment_dissatisfied,
-                        color: emotion == 'dissatisfied' ? Colors.orange : Colors.grey,
+                        color: emotion == 'dissatisfied'
+                            ? Colors.orange
+                            : Colors.grey,
                       ),
                       Icon(
                         Icons.sentiment_neutral,
-                        color: emotion == 'neutral' ? Colors.yellow : Colors.grey,
+                        color:
+                            emotion == 'neutral' ? Colors.yellow : Colors.grey,
                       ),
                       Icon(
                         Icons.sentiment_satisfied,
-                        color: emotion == 'satisfied' ? Colors.lightGreen : Colors.grey,
+                        color: emotion == 'satisfied'
+                            ? Colors.lightGreen
+                            : Colors.grey,
                       ),
                       Icon(
                         Icons.sentiment_very_satisfied,
-                        color: emotion == 'very_satisfied' ? Colors.green : Colors.grey,
+                        color: emotion == 'very_satisfied'
+                            ? Colors.green
+                            : Colors.grey,
                       ),
                     ],
                   ),
@@ -239,7 +263,7 @@ class ExerciseDetailPage extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    height: 300,  // Restored the original height
+                    height: 300, // Restored the original height
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: _buildLineChart(
                       _createFlSpots(angleData.cast<String, String>()),
@@ -258,7 +282,7 @@ class ExerciseDetailPage extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    height: 300,  // Restored the original height
+                    height: 300, // Restored the original height
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: _buildLineChart(
                       _createFlSpots(temperatureData.cast<String, String>()),
