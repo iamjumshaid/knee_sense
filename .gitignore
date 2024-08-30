@@ -82,3 +82,6 @@ ios/.generated
 *.orig
 *.orig.*
 *.rej
+
+.env
+GoogleService-Info.plist
